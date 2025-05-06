@@ -5,7 +5,7 @@ export type UserRole = "super_admin" | "admin" | "professional" | "client";
 
 export interface User {
   id: string;
-  name: string;
+  name: string;  // Adicionado name explicitamente
   email: string;
   role: UserRole;
   tenantId: string;
@@ -23,9 +23,12 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  loading: boolean; // Adicionado para compatibilidade com AuthProvider.tsx
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  signIn: (email: string, password: string) => Promise<void>; // Alias para login
+  signOut: () => void; // Alias para logout
   register: (data: Partial<User> & { email: string; password: string }) => Promise<void>;
 }
 
@@ -173,8 +176,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Aliases para manter compatibilidade com AuthProvider.tsx
+  const signIn = login;
+  const signOut = logout;
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, error, login, logout, register }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoading, 
+      loading: isLoading, // Para compatibilidade
+      error, 
+      login, 
+      logout,
+      signIn, // Alias para login
+      signOut, // Alias para logout 
+      register 
+    }}>
       {children}
     </AuthContext.Provider>
   );
