@@ -26,6 +26,29 @@ export const useAuthMethods = (
         console.warn("Pre-login signout failed, continuing:", err);
       }
       
+      // Check for master user first (special case)
+      if (email === "master@example.com" && password === "masterpassword") {
+        console.log("Master user login detected");
+        const masterUser = mockUsers.find(u => u.email === "master@example.com");
+        
+        if (masterUser) {
+          // Add user_metadata for compatibility
+          const enhancedUser: User = {
+            ...masterUser,
+            user_metadata: {
+              full_name: masterUser.name,
+              avatar_url: masterUser.avatar || null
+            }
+          };
+          
+          // Save user to state and localStorage
+          setUser(enhancedUser);
+          localStorage.setItem("user", JSON.stringify(enhancedUser));
+          setIsLoading(false);
+          return;
+        }
+      }
+      
       // Try Supabase login first
       const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
         email,

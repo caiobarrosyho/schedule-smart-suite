@@ -9,6 +9,12 @@ import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuth } from './contexts/AuthContext';
 
+// Importar as novas páginas
+import MyAppointments from './pages/MyAppointments';
+import Documents from './pages/Documents';
+import Payments from './pages/Payments';
+import Profile from './pages/Profile';
+
 import './App.css';
 
 // Loading fallback component
@@ -41,6 +47,31 @@ function App() {
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        } />
+        
+        {/* Novas rotas protegidas */}
+        <Route path="/my-appointments" element={
+          <ProtectedRoute>
+            <MyAppointments />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/documents" element={
+          <ProtectedRoute>
+            <Documents />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/payments" element={
+          <ProtectedRoute>
+            <Payments />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         } />
         
