@@ -67,7 +67,8 @@ const defaultTenant: Tenant = {
 };
 
 // Mock tenants for different clinic types
-const mockTenants: Record<string, Tenant> = {
+// Export the mockTenants to make it available for TenantManagement.tsx
+export const mockTenants: Record<string, Tenant> = {
   "demo": {
     ...defaultTenant
   },
