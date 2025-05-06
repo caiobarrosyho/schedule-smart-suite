@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTenant } from "../contexts/TenantContext";
@@ -91,10 +90,10 @@ const generateMockAppointments = (userId: string, tenantId: string, userRole: st
 };
 
 const Dashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { tenant } = useTenant();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [calendarView, setCalendarView] = useState<"day" | "week" | "month" | "agenda">("week");
 
@@ -103,7 +102,7 @@ const Dashboard: React.FC = () => {
     if (user) {
       const mockAppointments = generateMockAppointments(user.id, tenant.id, user.role);
       setAppointments(mockAppointments);
-      setLoading(false);
+      setIsLoading(false);
     }
   }, [user, tenant.id]);
 
@@ -142,6 +141,18 @@ const Dashboard: React.FC = () => {
     toast.info(`Selecionado: ${appointment.title || "Agendamento"}`);
     console.log("Selected appointment:", appointment);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-tenant"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;  // This should not happen because of ProtectedRoute, but just in case
+  }
 
   return (
     <AppLayout>
@@ -247,7 +258,7 @@ const Dashboard: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent className="pt-4 pb-0">
-                {loading ? (
+                {isLoading ? (
                   <div className="h-[500px] flex items-center justify-center">
                     <div className="flex flex-col items-center space-y-4">
                       <div className="h-8 w-8 animate-spin rounded-full border-4 border-tenant border-t-transparent"></div>

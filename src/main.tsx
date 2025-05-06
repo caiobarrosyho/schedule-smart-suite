@@ -6,17 +6,17 @@ import App from './App.tsx'
 import './index.css'
 import { Toaster } from 'sonner'
 import { TenantProvider } from './contexts/TenantContext.tsx'
-import { AuthProvider } from './components/auth/AuthProvider.tsx'
+import { AuthProvider } from './contexts/AuthContext.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
+    <AuthProvider>
+      <BrowserRouter>
         <TenantProvider>
           <Toaster position="top-right" />
           <App />
         </TenantProvider>
-      </AuthProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </AuthProvider>
   </React.StrictMode>,
 )
