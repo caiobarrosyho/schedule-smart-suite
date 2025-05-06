@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -24,7 +23,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export const LoginForm: React.FC = () => {
-  const { signIn, loading, error } = useAuth();
+  const { login, isLoading, error } = useAuth();
   const [showSignUp, setShowSignUp] = useState(false);
   
   const form = useForm<FormData>({
@@ -36,7 +35,7 @@ export const LoginForm: React.FC = () => {
   });
 
   const onSubmit = async (data: FormData) => {
-    await signIn(data.email, data.password);
+    await login(data.email, data.password);
   };
 
   const formSignUp = useForm<FormData & { first_name: string; last_name: string }>({
@@ -54,7 +53,7 @@ export const LoginForm: React.FC = () => {
 
   const onSignUp = async (data: FormData & { first_name: string; last_name: string }) => {
     const { email, password, first_name, last_name } = data;
-    await signIn(email, password);
+    await login(email, password);
   };
 
   return (
@@ -99,8 +98,8 @@ export const LoginForm: React.FC = () => {
                   Esqueceu a senha?
                 </Link>
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Entrando...' : 'Entrar'}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Entrando...' : 'Entrar'}
               </Button>
             </form>
           </Form>
@@ -180,8 +179,8 @@ export const LoginForm: React.FC = () => {
                 )}
               />
               {error && <p className="text-red-500 text-sm">{error}</p>}
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Cadastrando...' : 'Cadastrar'}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Cadastrando...' : 'Cadastrar'}
               </Button>
             </form>
           </Form>
