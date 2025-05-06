@@ -1,10 +1,10 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { User as SupabaseUser } from '@supabase/supabase-js';
 import { User } from "@/types/user";
 import { AuthContextType, mockUsers } from "@/types/auth";
 import { mapSupabaseUserToUser, cleanupAuthState } from "@/utils/authUtils";
+import { useAuthMethods } from "@/hooks/useAuthMethods";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -13,32 +13,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Extract authentication methods to a separate hook file
+  const { login, logout, register } = useAuthMethods(setUser, setIsLoading, setError);
+
   // Check if user is already logged in (from Supabase or localStorage fallback)
   useEffect(() => {
     const checkAuth = async () => {
       try {
         setIsLoading(true);
-        setError(null);
+        console.log("Checking authentication state...");
         
         // First try to get authenticated user from Supabase
         const { data: { user: supabaseUser } } = await supabase.auth.getUser();
         
         if (supabaseUser) {
+          console.log("Found authenticated Supabase user:", supabaseUser);
           // If user is in Supabase, map to our User type
           const mappedUser = await mapSupabaseUserToUser(supabaseUser);
           setUser(mappedUser);
           localStorage.setItem("user", JSON.stringify(mappedUser));
         } else {
           // Fallback to localStorage for mock flow
+          console.log("No Supabase user, checking localStorage...");
           const storedUser = localStorage.getItem("user");
           if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            console.log("Found user in localStorage");
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+            
+            // Validate stored user data
+            if (!parsedUser.email || !parsedUser.role) {
+              console.warn("Stored user data is invalid, logging out");
+              localStorage.removeItem("user");
+              setUser(null);
+            }
+          } else {
+            console.log("No user found in localStorage");
+            setUser(null);
           }
         }
       } catch (err) {
         console.error("Failed to restore session:", err);
         setError("Session expired. Please login again.");
         localStorage.removeItem("user");
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
@@ -47,6 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event);
         setIsLoading(true);
         if (event === 'SIGNED_IN' && session?.user) {
           const mappedUser = await mapSupabaseUserToUser(session.user);
@@ -67,9 +86,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       subscription.unsubscribe();
     };
   }, []);
-
-  // Extract authentication methods to a separate hook file
-  const { login, logout, register } = useAuthMethods(setUser, setIsLoading, setError);
 
   // Aliases for compatibility with AuthProvider.tsx
   const signIn = login;
@@ -99,6 +115,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-// Import the auth methods
-import { useAuthMethods } from "@/hooks/useAuthMethods";

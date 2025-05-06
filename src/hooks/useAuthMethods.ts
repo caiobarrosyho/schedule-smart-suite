@@ -17,34 +17,39 @@ export const useAuthMethods = (
       // Clean up existing state for a clean login attempt
       cleanupAuthState();
       
-      // Try to sign out globally first to avoid auth conflicts
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        // Continue even if this fails
-        console.warn("Pre-login signout failed, continuing:", err);
-      }
+      console.log("Login attempt:", { email });
       
-      // Special handling for master user - simplified for easier testing
+      // Special handling for master user - simplified for easy testing
       if (email === "master@example.com" || email === "master") {
         console.log("Master user login detected");
+        
+        if (password !== "masterpassword") {
+          throw new Error("Invalid password for master user");
+        }
+        
         const masterUser = mockUsers.find(u => u.role === "master");
         
         if (masterUser) {
           console.log("Found master user in mock data:", masterUser);
           
-          // Add user_metadata for compatibility
+          // Add required fields to ensure it matches User type
           const enhancedUser: User = {
-            ...masterUser,
+            id: masterUser.id,
+            email: "master@example.com", // Ensure email is not undefined
+            role: "master",
+            name: "Master Admin",
+            tenantId: "master",
+            createdAt: new Date().toISOString(),
             user_metadata: {
-              full_name: masterUser.name,
-              avatar_url: masterUser.avatar || null
+              full_name: "Master Administrator",
+              avatar_url: null
             }
           };
           
           // Save user to state and localStorage
           setUser(enhancedUser);
           localStorage.setItem("user", JSON.stringify(enhancedUser));
+          console.log("Master user successfully logged in");
           setIsLoading(false);
           return;
         }
@@ -75,8 +80,9 @@ export const useAuthMethods = (
         // Add user_metadata for compatibility
         const enhancedUser: User = {
           ...foundUser,
+          email: foundUser.email, // Ensure email is not undefined
           user_metadata: {
-            full_name: foundUser.name,
+            full_name: foundUser.name || "User",
             avatar_url: foundUser.avatar || null
           }
         };
@@ -151,7 +157,7 @@ export const useAuthMethods = (
           createdAt: new Date().toISOString(),
           ...data,
           user_metadata: {
-            full_name: data.name,
+            full_name: data.name || "New User",
             avatar_url: data.avatar || null
           }
         };
