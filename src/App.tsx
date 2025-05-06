@@ -16,6 +16,7 @@ import Documents from './pages/Documents';
 import Payments from './pages/Payments';
 import Profile from './pages/Profile';
 import TenantManagement from './pages/TenantManagement';
+import UserManagement from './pages/UserManagement';
 
 import './App.css';
 
@@ -81,6 +82,13 @@ function App() {
         <Route path="/tenant-management" element={
           <RoleProtectedRoute allowedRoles={['master']}>
             <TenantManagement />
+          </RoleProtectedRoute>
+        } />
+
+        {/* Nova rota de gerenciamento de usuários - apenas para usuários master */}
+        <Route path="/user-management" element={
+          <RoleProtectedRoute allowedRoles={['master']}>
+            <UserManagement />
           </RoleProtectedRoute>
         } />
         
