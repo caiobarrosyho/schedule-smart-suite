@@ -3,13 +3,13 @@ import React from 'react';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { useTenant } from '@/contexts/TenantContext';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/components/auth/AuthProvider';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login: React.FC = () => {
   const { tenant } = useTenant();
-  const { user, loading } = useAuth();
+  const { user, isLoading } = useAuth();
 
-  if (loading) {
+  if (isLoading) {
     return <div className="flex justify-center items-center min-h-screen">Carregando...</div>;
   }
   
