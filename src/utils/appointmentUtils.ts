@@ -1,23 +1,21 @@
 
 import { AppointmentStatus } from '@/types';
-import { Badge } from '@/components/ui/badge';
-import React from 'react';
 
-// Função para obter o badge de status com a cor apropriada
-export const getStatusBadge = (status: AppointmentStatus) => {
+// Função para obter as propriedades do badge de status
+export const getStatusBadgeProps = (status: AppointmentStatus) => {
   switch (status) {
     case 'scheduled':
-      return <Badge className="bg-blue-500">Agendado</Badge>;
+      return { className: "bg-blue-500", label: "Agendado" };
     case 'confirmed':
-      return <Badge className="bg-green-500">Confirmado</Badge>;
+      return { className: "bg-green-500", label: "Confirmado" };
     case 'completed':
-      return <Badge className="bg-purple-500">Finalizado</Badge>;
+      return { className: "bg-purple-500", label: "Finalizado" };
     case 'cancelled':
-      return <Badge className="bg-red-500">Cancelado</Badge>;
+      return { className: "bg-red-500", label: "Cancelado" };
     case 'no_show':
-      return <Badge className="bg-yellow-500">Não Compareceu</Badge>;
+      return { className: "bg-yellow-500", label: "Não Compareceu" };
     default:
-      return <Badge className="bg-gray-500">{status}</Badge>;
+      return { className: "bg-gray-500", label: status };
   }
 };
 

@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Appointment } from '@/types/appointment';
-import { formatDate, formatTime, getStatusBadge } from '@/utils/appointmentUtils';
+import { formatDate, formatTime, getStatusBadgeProps } from '@/utils/appointmentUtils';
 import { AppointmentStatusIcon } from './AppointmentStatusIcon';
 
 interface AppointmentCardProps {
@@ -10,6 +11,8 @@ interface AppointmentCardProps {
 }
 
 export const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment }) => {
+  const badgeProps = getStatusBadgeProps(appointment.status);
+  
   return (
     <div 
       className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
@@ -24,7 +27,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment })
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        {getStatusBadge(appointment.status)}
+        <Badge className={badgeProps.className}>{badgeProps.label}</Badge>
         <Button variant="outline" size="sm">
           Detalhes
         </Button>
