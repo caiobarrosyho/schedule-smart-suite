@@ -1,32 +1,7 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from '@supabase/supabase-js';
-
-export type UserRole = "super_admin" | "admin" | "professional" | "client" | "master";
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  tenantId: string;
-  avatar?: string | null;
-  createdAt: string;
-  // Professional specific fields
-  specialty?: string;
-  bio?: string;
-  // Client specific fields
-  phone?: string;
-  birthDate?: string;
-  medicalNotes?: string;
-  // Add user_metadata field for compatibility with Supabase Auth
-  user_metadata?: {
-    avatar_url?: string;
-    full_name?: string;
-    [key: string]: any;
-  };
-}
+import { User, UserRole } from "@/types/user";
 
 interface AuthContextType {
   user: User | null;
@@ -113,7 +88,7 @@ const mapSupabaseUserToUser = async (sbUser: SupabaseUser): Promise<User> => {
   }
   
   // Try to get profile data
-  let profileData = {};
+  let profileData: Record<string, any> = {};
   try {
     const { data, error } = await supabase
       .from('profiles')
@@ -131,12 +106,19 @@ const mapSupabaseUserToUser = async (sbUser: SupabaseUser): Promise<User> => {
   // Build user object
   const user: User = {
     id: sbUser.id,
-    name: sbUser.user_metadata?.full_name || profileData?.first_name + ' ' + profileData?.last_name || sbUser.email?.split('@')[0] || '',
+    name: sbUser.user_metadata?.full_name || 
+          (profileData?.first_name && profileData?.last_name ? 
+            `${profileData.first_name} ${profileData.last_name}` : 
+            sbUser.email?.split('@')[0] || ''),
     email: sbUser.email || '',
     role: role,
     tenantId: tenantId,
     createdAt: sbUser.created_at || new Date().toISOString(),
     avatar: sbUser.user_metadata?.avatar_url || profileData?.avatar_url || null,
+    // Include first_name and last_name for compatibility
+    first_name: profileData?.first_name || sbUser.user_metadata?.first_name,
+    last_name: profileData?.last_name || sbUser.user_metadata?.last_name,
+    avatar_url: profileData?.avatar_url || sbUser.user_metadata?.avatar_url,
     // Include user_metadata for compatibility
     user_metadata: sbUser.user_metadata || {},
     ...profileData
