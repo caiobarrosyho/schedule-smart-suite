@@ -3,7 +3,7 @@ import React from 'react';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { useTenant } from '@/contexts/TenantContext';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/components/auth/AuthProvider';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login: React.FC = () => {
   const { tenant } = useTenant();
