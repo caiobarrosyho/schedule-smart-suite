@@ -1,122 +1,11 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Clock, AlertCircle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { AppointmentStatus } from '@/types';
-import { Appointment } from '@/types/appointment';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { useTenant } from '@/contexts/TenantContext';
+import { useAppointmentsData } from '@/hooks/useAppointmentsData';
+import { AppointmentList } from '@/components/appointments/AppointmentList';
 
 const MyAppointments: React.FC = () => {
-  const { user } = useAuth();
-  const { tenant } = useTenant();
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  // Função para mapear dados brutos para o formato Appointment
-  const mapToAppointment = (raw: any): Appointment => ({
-    id: raw.id,
-    tenantId: raw.tenantId,
-    clientId: raw.clientId,
-    professionalId: raw.professionalId,
-    serviceId: raw.serviceId,
-    startTime: raw.startTime,
-    endTime: raw.endTime,
-    status: raw.status,
-    title: raw.title || '',
-    notes: raw.notes,
-    createdAt: raw.createdAt,
-    updatedAt: raw.updatedAt || raw.createdAt,
-    cancelledAt: raw.cancelledAt,
-    cancelledBy: raw.cancelledBy,
-    cancellationReason: raw.cancellationReason,
-    rescheduleCount: raw.rescheduleCount || 0,
-    previousAppointment: raw.previousAppointment,
-    payment: raw.payment,
-    recurrence: raw.recurrence
-  });
-
-  // Função para gerar dados de exemplo
-  const generateMockAppointments = () => {
-    if (!user) return [];
-    
-    const now = new Date();
-    const rawAppointments: any[] = [];
-    
-    // Criar alguns agendamentos passados
-    for (let i = 0; i < 3; i++) {
-      const pastDate = new Date();
-      pastDate.setDate(now.getDate() - (i + 1));
-      pastDate.setHours(9 + i, 0, 0);
-      
-      const endDate = new Date(pastDate);
-      endDate.setMinutes(pastDate.getMinutes() + 60);
-      
-      rawAppointments.push({
-        id: `past-${i}`,
-        clientId: user.id,
-        professionalId: `prof-${i}`,
-        serviceId: `service-${i}`,
-        startTime: pastDate.toISOString(),
-        endTime: endDate.toISOString(),
-        status: i === 0 ? 'completed' : i === 1 ? 'cancelled' : 'no_show',
-        title: ['Corte de Cabelo', 'Manicure', 'Consulta Dentária'][i % 3],
-        notes: i === 1 ? 'Cliente solicitou cancelamento' : undefined,
-        createdAt: new Date(pastDate.getTime() - 86400000).toISOString(),
-        tenantId: tenant.id || user.tenantId || 'default',
-        cancelledAt: i === 1 ? new Date(pastDate.getTime() - 43200000).toISOString() : undefined,
-        cancelledBy: i === 1 ? user.id : undefined,
-        cancellationReason: i === 1 ? 'Compromisso de trabalho' : undefined,
-        rescheduleCount: i === 2 ? 1 : 0,
-        payment: i === 0 ? {
-          id: `payment-${i}`,
-          status: 'completed',
-          amount: 50 + (i * 10),
-          method: 'credit_card'
-        } : undefined
-      });
-    }
-    
-    // Criar alguns agendamentos futuros
-    for (let i = 0; i < 4; i++) {
-      const futureDate = new Date();
-      futureDate.setDate(now.getDate() + i);
-      futureDate.setHours(14 + (i % 3), 0, 0);
-      
-      const endDate = new Date(futureDate);
-      endDate.setMinutes(futureDate.getMinutes() + 60);
-      
-      rawAppointments.push({
-        id: `future-${i}`,
-        clientId: user.id,
-        professionalId: `prof-${i + 3}`,
-        serviceId: `service-${i + 3}`,
-        startTime: futureDate.toISOString(),
-        endTime: endDate.toISOString(),
-        status: i === 0 ? 'scheduled' : 'confirmed',
-        title: ['Consulta Dentária', 'Corte de Cabelo', 'Manicure', 'Coloração'][i % 4],
-        createdAt: new Date(futureDate.getTime() - 86400000).toISOString(),
-        tenantId: tenant.id || user.tenantId || 'default',
-        rescheduleCount: 0
-      });
-    }
-    
-    return rawAppointments.map(mapToAppointment);
-  };
-
-  useEffect(() => {
-    // Simular carregamento de dados
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      setAppointments(generateMockAppointments());
-      setIsLoading(false);
-    }, 1000);
-  }, [user, tenant]);
+  const { upcomingAppointments, pastAppointments, isLoading } = useAppointmentsData();
 
   if (isLoading) {
     return (
@@ -128,20 +17,6 @@ const MyAppointments: React.FC = () => {
     );
   }
 
-  // Separar agendamentos futuros e passados
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  const upcomingAppointments = appointments.filter(apt => {
-    const aptDate = new Date(apt.startTime);
-    return aptDate >= today;
-  }).sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
-  
-  const pastAppointments = appointments.filter(apt => {
-    const aptDate = new Date(apt.startTime);
-    return aptDate < today;
-  }).sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
-
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -151,130 +26,23 @@ const MyAppointments: React.FC = () => {
         </div>
         
         <div className="space-y-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Calendar className="mr-2 h-5 w-5 text-tenant" />
-                Próximos Agendamentos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {upcomingAppointments.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  Você não possui agendamentos futuros.
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {upcomingAppointments.map(appointment => (
-                    <div 
-                      key={appointment.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div className="bg-tenant/10 p-3 rounded-full">
-                          <Clock className="h-5 w-5 text-tenant" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">{appointment.title}</h3>
-                          <p className="text-sm text-gray-500">
-                            {formatDate(appointment.startTime)} às {formatTime(appointment.startTime)}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        {getStatusBadge(appointment.status)}
-                        <Button variant="outline" size="sm">
-                          Detalhes
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <AppointmentList
+            title="Próximos Agendamentos"
+            icon="upcoming"
+            appointments={upcomingAppointments}
+            emptyMessage="Você não possui agendamentos futuros."
+          />
           
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <AlertCircle className="mr-2 h-5 w-5 text-tenant" />
-                Histórico de Agendamentos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {pastAppointments.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  Você não possui histórico de agendamentos.
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {pastAppointments.map(appointment => (
-                    <div 
-                      key={appointment.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div className="bg-gray-100 p-3 rounded-full">
-                          <Clock className="h-5 w-5 text-gray-500" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">{appointment.title}</h3>
-                          <p className="text-sm text-gray-500">
-                            {formatDate(appointment.startTime)} às {formatTime(appointment.startTime)}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        {getStatusBadge(appointment.status)}
-                        <Button variant="outline" size="sm">
-                          Detalhes
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <AppointmentList
+            title="Histórico de Agendamentos"
+            icon="past"
+            appointments={pastAppointments}
+            emptyMessage="Você não possui histórico de agendamentos."
+          />
         </div>
       </div>
     </AppLayout>
   );
-};
-
-// Funções auxiliares
-const getStatusBadge = (status: AppointmentStatus) => {
-  switch (status) {
-    case 'scheduled':
-      return <Badge className="bg-blue-500">Agendado</Badge>;
-    case 'confirmed':
-      return <Badge className="bg-green-500">Confirmado</Badge>;
-    case 'completed':
-      return <Badge className="bg-purple-500">Finalizado</Badge>;
-    case 'cancelled':
-      return <Badge className="bg-red-500">Cancelado</Badge>;
-    case 'no_show':
-      return <Badge className="bg-yellow-500">Não Compareceu</Badge>;
-    default:
-      return <Badge className="bg-gray-500">{status}</Badge>;
-  }
-};
-
-const formatDate = (isoString: string) => {
-  const date = new Date(isoString);
-  return date.toLocaleDateString('pt-BR', { 
-    day: '2-digit', 
-    month: '2-digit',
-    year: 'numeric'
-  });
-};
-
-const formatTime = (isoString: string) => {
-  const date = new Date(isoString);
-  return date.toLocaleTimeString('pt-BR', { 
-    hour: '2-digit', 
-    minute: '2-digit'
-  });
 };
 
 export default MyAppointments;
