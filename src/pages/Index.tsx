@@ -1,104 +1,96 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useTenant } from "../contexts/TenantContext";
-import { useAuth } from "../contexts/AuthContext";
-import { Navigate } from "react-router-dom";
-import { LoginForm } from "../components/auth/LoginForm";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Users as UsersIcon, Bell } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { Navigate } from "react-router-dom";
+import { CalendarIcon, UsersIcon, Bell } from "lucide-react";
 
 const Index: React.FC = () => {
   const { tenant, isLoading } = useTenant();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
-  useEffect(() => {
-    document.title = tenant.name || "Sistema de Agendamentos";
-  }, [tenant.name]);
-
-  // If user is logged in, redirect to dashboard
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-tenant border-t-transparent"></div>
-          <p className="text-lg text-tenant">Carregando...</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-tenant mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-700">Carregando...</h2>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-tenant-secondary to-tenant">
-      <div className="container mx-auto px-4 py-8">
-        <header className="flex items-center justify-between py-6">
-          <div className="flex items-center">
-            {tenant.logo ? (
-              <img src={tenant.logo} alt={tenant.name} className="h-10" />
-            ) : (
-              <div className="h-10 w-10 rounded-full bg-tenant-foreground text-tenant flex items-center justify-center font-bold text-lg">
-                {tenant.name.charAt(0)}
-              </div>
-            )}
-            <span className="ml-3 text-2xl font-bold text-white">{tenant.name}</span>
-          </div>
-          <nav>
-            <Button 
-              className="bg-white text-tenant hover:bg-gray-100"
-              onClick={() => window.location.href = "/login"}
-            >
-              Entrar
-            </Button>
-          </nav>
-        </header>
-      
-        <main className="my-16 flex flex-col-reverse md:flex-row items-center">
-          <div className="w-full md:w-1/2 md:pr-12 mb-12 md:mb-0">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Sistema completo de agendamentos para sua clínica
-            </h1>
-            <p className="text-lg md:text-xl text-white opacity-90 mb-8">
-              Gerencie seus agendamentos, clientes e profissionais em um só lugar.
-              Otimize seu tempo e aumente a satisfação de seus clientes.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                size="lg" 
-                className="bg-white text-tenant hover:bg-gray-100"
-                onClick={() => window.location.href = "/register"}
-              >
-                Comece seu período de testes
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="text-white border-white hover:bg-white/10"
-              >
-                Saiba mais
-              </Button>
-            </div>
-          </div>
-          
-          <div className="w-full md:w-1/2 flex justify-center mb-12 md:mb-0">
-            <div className="w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden">
-              <div className="p-8">
-                <h2 className="text-2xl font-bold text-tenant-accent-foreground mb-6 text-center">
-                  Acesse sua conta
-                </h2>
-                <LoginForm />
-              </div>
-            </div>
-          </div>
-        </main>
+  // Se o usuário estiver logado, redirecionar para o dashboard
+  if (user) {
+    return <Navigate to="/dashboard" />;
+  }
 
-        <div className="mt-24 mb-16">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">
-            Funcionalidades principais
-          </h2>
-          
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center">
+              {tenant.logo ? (
+                <img
+                  src={tenant.logo}
+                  alt={tenant.name}
+                  className="h-10 w-auto"
+                />
+              ) : (
+                <h1 className="text-xl font-bold text-tenant">{tenant.name}</h1>
+              )}
+            </div>
+            <div>
+              <Button asChild className="mr-2">
+                <Link to="/login">Entrar</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <a href="#contact">Contato</a>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <div className="bg-gradient-to-b from-tenant/10 to-white py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
+              Simplifique o agendamento da sua{" "}
+              <span className="text-tenant">{tenant.theme === 'dental' ? 'clínica' : tenant.theme === 'barber' ? 'barbearia' : tenant.theme === 'salon' ? 'salão' : 'empresa'}</span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Gerencie sua agenda, clientes e finanças em um só lugar com nosso sistema completo de agendamento e gestão.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" asChild>
+                <Link to="/login">Começar agora</Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <a href="#features">Conhecer recursos</a>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div id="features" className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Recursos completos para sua gestão
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Nossa plataforma foi desenvolvida para atender todas as necessidades de agendamento e gestão da sua {tenant.theme === 'dental' ? 'clínica' : tenant.theme === 'barber' ? 'barbearia' : tenant.theme === 'salon' ? 'salão' : 'empresa'}.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-xl shadow-lg">
               <div className="h-12 w-12 bg-tenant rounded-lg flex items-center justify-center mb-6">
@@ -106,7 +98,7 @@ const Index: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold mb-4">Agendamento Inteligente</h3>
               <p className="text-gray-600">
-                Configure slots de disponibilidade por profissional, faça agendamentos recorrentes e mantenha uma fila de espera para maximizar sua agenda.
+                Gerencie sua agenda com eficiência, evite conflitos de horários e configure intervalos personalizados para cada profissional.
               </p>
             </div>
             
@@ -116,7 +108,7 @@ const Index: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold mb-4">Gestão de Clientes</h3>
               <p className="text-gray-600">
-                Mantenha fichas completas de seus clientes, com histórico de atendimento, documentos e preferências personalizadas.
+                Mantenha um cadastro completo dos seus clientes, incluindo histórico de atendimentos, preferências e documentos.
               </p>
             </div>
             
@@ -124,53 +116,109 @@ const Index: React.FC = () => {
               <div className="h-12 w-12 bg-tenant rounded-lg flex items-center justify-center mb-6">
                 <Bell className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-4">Notificações Automáticas</h3>
+              <h3 className="text-xl font-bold mb-4">Comunicação Automática</h3>
               <p className="text-gray-600">
-                Envie lembretes por e-mail e WhatsApp automaticamente, reduza faltas e mantenha seus clientes informados.
+                Envie lembretes e confirmações por WhatsApp e email automaticamente, reduzindo faltas e aumentando a satisfação.
               </p>
             </div>
           </div>
         </div>
       </div>
-      
-      <footer className="bg-tenant-foreground text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+
+      {/* CTA Section */}
+      <div className="bg-tenant py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Pronto para transformar sua gestão?
+          </h2>
+          <p className="text-lg text-white/80 mb-8 max-w-3xl mx-auto">
+            Experimente gratuitamente por 30 dias e descubra como podemos ajudar a otimizar seus processos.
+          </p>
+          <Button size="lg" variant="secondary" asChild>
+            <Link to="/login">Iniciar período de teste</Link>
+          </Button>
+        </div>
+      </div>
+
+      {/* Contact Section */}
+      <div id="contact" className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Fale conosco</h2>
+            <p className="text-lg text-gray-600">
+              Estamos à disposição para responder suas dúvidas e ajudar no que for preciso.
+            </p>
+          </div>
+
+          <div className="bg-white shadow-lg rounded-lg p-6 md:p-8">
+            <form className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nome</label>
+                  <input
+                    type="text"
+                    id="name"
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-tenant focus:border-tenant"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-tenant focus:border-tenant"
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-700">Assunto</label>
+                <input
+                  type="text"
+                  id="subject"
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-tenant focus:border-tenant"
+                />
+              </div>
+              <div>
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700">Mensagem</label>
+                <textarea
+                  id="message"
+                  rows={4}
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-tenant focus:border-tenant"
+                ></textarea>
+              </div>
+              <div>
+                <Button type="submit" className="w-full">Enviar mensagem</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-lg font-bold mb-4">Sobre nós</h3>
-              <p className="text-white/70">
-                Sistema de agendamento multitenancy para diversos tipos de clínicas e serviços.
+              <h3 className="text-lg font-bold mb-4">{tenant.name}</h3>
+              <p className="text-gray-400">
+                Sistema completo de agendamento e gestão para {tenant.theme === 'dental' ? 'clínicas' : tenant.theme === 'barber' ? 'barbearias' : tenant.theme === 'salon' ? 'salões' : 'empresas'}.
               </p>
             </div>
-            
             <div>
               <h3 className="text-lg font-bold mb-4">Links rápidos</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-white/70 hover:text-white">Funcionalidades</a></li>
-                <li><a href="#" className="text-white/70 hover:text-white">Planos</a></li>
-                <li><a href="#" className="text-white/70 hover:text-white">Suporte</a></li>
+                <li><a href="#features" className="text-gray-400 hover:text-white transition-colors">Recursos</a></li>
+                <li><a href="#contact" className="text-gray-400 hover:text-white transition-colors">Contato</a></li>
+                <li><Link to="/login" className="text-gray-400 hover:text-white transition-colors">Login</Link></li>
               </ul>
             </div>
-            
-            <div>
-              <h3 className="text-lg font-bold mb-4">Legal</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-white/70 hover:text-white">Termos de Uso</a></li>
-                <li><a href="#" className="text-white/70 hover:text-white">Política de Privacidade</a></li>
-                <li><a href="#" className="text-white/70 hover:text-white">LGPD</a></li>
-              </ul>
-            </div>
-            
             <div>
               <h3 className="text-lg font-bold mb-4">Contato</h3>
-              <ul className="space-y-2">
-                <li className="text-white/70">contato@exemplo.com</li>
-                <li className="text-white/70">(11) 99999-9999</li>
-              </ul>
+              <p className="text-gray-400">contato@sistema-agendamento.com</p>
+              <p className="text-gray-400">(11) 9999-9999</p>
             </div>
           </div>
-          
-          <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/50">
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
             <p>© {new Date().getFullYear()} {tenant.name}. Todos os direitos reservados.</p>
           </div>
         </div>

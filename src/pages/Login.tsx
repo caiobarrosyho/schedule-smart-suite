@@ -1,23 +1,38 @@
 
-import React from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useTenant } from "../contexts/TenantContext";
-import { Navigate } from "react-router-dom";
-import { LoginForm } from "../components/auth/LoginForm";
+import React from 'react';
+import { LoginForm } from '@/components/auth/LoginForm';
+import { useTenant } from '@/contexts/TenantContext';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 const Login: React.FC = () => {
-  const { user } = useAuth();
-  const { tenant, isLoading } = useTenant();
+  const { tenant } = useTenant();
+  const { user, loading } = useAuth();
 
-  // If user is already logged in, redirect to dashboard
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen">Carregando...</div>;
+  }
+  
   if (user) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/dashboard" />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <LoginForm onSuccess={() => {}} />
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        {tenant.logo ? (
+          <img
+            src={tenant.logo}
+            alt={tenant.name}
+            className="mx-auto h-16 w-auto"
+          />
+        ) : (
+          <h1 className="text-center text-3xl font-bold text-tenant">{tenant.name}</h1>
+        )}
+      </div>
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <LoginForm />
       </div>
     </div>
   );
