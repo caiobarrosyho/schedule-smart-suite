@@ -149,13 +149,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 {!sidebarCollapsed && (
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar || undefined} />
+                      <AvatarImage src={user.user_metadata?.avatar_url || undefined} />
                       <AvatarFallback className="bg-tenant text-tenant-foreground">
-                        {user.name?.charAt(0) || "U"}
+                        {user.email?.charAt(0).toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="text-sm font-medium">{user.name}</p>
+                      <p className="text-sm font-medium">{user.user_metadata?.full_name || user.email}</p>
                       <p className="text-xs text-gray-500">{user.email}</p>
                     </div>
                   </div>
