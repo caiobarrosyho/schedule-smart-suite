@@ -1,6 +1,6 @@
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import Index from './pages/Index';
 import Login from './pages/Login';
 import Unauthorized from './pages/Unauthorized';
@@ -19,9 +19,14 @@ const LoadingFallback = () => (
 );
 
 function App() {
-  const { loading } = useAuth();
+  const { loading, user } = useAuth();
+  
+  useEffect(() => {
+    console.log("App mounted, auth state:", { loading, user });
+  }, [loading, user]);
 
   if (loading) {
+    console.log("App - Auth is loading");
     return <LoadingFallback />;
   }
 

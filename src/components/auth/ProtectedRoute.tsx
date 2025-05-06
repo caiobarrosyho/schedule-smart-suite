@@ -14,6 +14,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { user, loading } = useAuth();
 
+  // Adicionamos logs para depuração
+  console.log("ProtectedRoute - Auth state:", { user, loading, requiredRole });
+
   if (loading) {
     // Show loading state while checking authentication
     return <div className="flex items-center justify-center min-h-screen">
@@ -22,16 +25,19 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!user) {
+    console.log("ProtectedRoute - User not authenticated, redirecting to login");
     // Redirect to login if not authenticated
     return <Navigate to="/login" replace />;
   }
 
   if (requiredRole && user.role !== requiredRole) {
+    console.log("ProtectedRoute - User doesn't have required role:", requiredRole);
     // Redirect to unauthorized if user doesn't have required role
     return <Navigate to="/unauthorized" replace />;
   }
 
   // Render children if authenticated and authorized
+  console.log("ProtectedRoute - Auth passed, rendering children");
   return <>{children}</>;
 };
 

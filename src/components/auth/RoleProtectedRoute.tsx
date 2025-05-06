@@ -4,8 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Skeleton } from '@/components/ui/skeleton';
-
-type UserRole = 'super_admin' | 'admin' | 'professional' | 'client';
+import { UserRole } from '@/types/user';
 
 interface RoleProtectedRouteProps {
   children: React.ReactNode;
@@ -25,6 +24,9 @@ export const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({
   
   const isLoading = authLoading || roleLoading;
 
+  // Adicionamos logs para depuração
+  console.log("RoleProtectedRoute - Auth state:", { user, authLoading, role, roleLoading, allowedRoles });
+
   if (isLoading) {
     return (
       <div className="p-8 w-full max-w-screen-xl mx-auto">
@@ -39,12 +41,15 @@ export const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({
   }
 
   if (!user) {
+    console.log("RoleProtectedRoute - User not authenticated, redirecting to login");
     return <Navigate to="/login" replace />;
   }
 
   if (!role || !allowedRoles.includes(role as UserRole)) {
+    console.log("RoleProtectedRoute - User doesn't have required role:", { role, allowedRoles });
     return <Navigate to={fallbackPath} replace />;
   }
 
+  console.log("RoleProtectedRoute - Auth passed, rendering children");
   return <>{children}</>;
 };
