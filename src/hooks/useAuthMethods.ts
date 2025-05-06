@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types/user";
@@ -27,7 +26,7 @@ export const useAuthMethods = (
       }
       
       // Check for master user first (special case)
-      if (email === "master@example.com" && password === "masterpassword") {
+      if ((email === "master@example.com" || email === "master") && password === "masterpassword") {
         console.log("Master user login detected");
         const masterUser = mockUsers.find(u => u.email === "master@example.com");
         
