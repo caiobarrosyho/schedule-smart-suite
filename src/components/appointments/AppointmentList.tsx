@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Appointment } from '@/types/appointment';
 import { AppointmentCard } from './AppointmentCard';
 import { Calendar, AlertCircle } from 'lucide-react';
+import { EmptyAppointments } from './EmptyAppointments';
 
 interface AppointmentListProps {
   title: string;
@@ -32,9 +33,7 @@ export const AppointmentList: React.FC<AppointmentListProps> = ({
       </CardHeader>
       <CardContent>
         {appointments.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            {emptyMessage}
-          </div>
+          <EmptyAppointments message={emptyMessage} />
         ) : (
           <div className="space-y-4">
             {appointments.map(appointment => (
