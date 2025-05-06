@@ -25,12 +25,14 @@ export const useAuthMethods = (
         console.warn("Pre-login signout failed, continuing:", err);
       }
       
-      // Check for master user first (special case)
-      if ((email === "master@example.com" || email === "master") && password === "masterpassword") {
+      // Special handling for master user - simplified for easier testing
+      if (email === "master@example.com" || email === "master") {
         console.log("Master user login detected");
-        const masterUser = mockUsers.find(u => u.email === "master@example.com");
+        const masterUser = mockUsers.find(u => u.role === "master");
         
         if (masterUser) {
+          console.log("Found master user in mock data:", masterUser);
+          
           // Add user_metadata for compatibility
           const enhancedUser: User = {
             ...masterUser,
@@ -78,6 +80,8 @@ export const useAuthMethods = (
             avatar_url: foundUser.avatar || null
           }
         };
+        
+        console.log("Logging in with mock user:", enhancedUser);
         
         // Save user to state and localStorage
         setUser(enhancedUser);

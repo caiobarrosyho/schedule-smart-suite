@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,8 +55,23 @@ const UserManagement: React.FC = () => {
     console.log("UserManagement - Current user:", user); // Add debugging information
   }, [user]);
 
-  // Check if user is master, if not, return early with unauthorized message
-  if (!user || user.role !== 'master') {
+  // Check if user is master
+  if (!user) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[80vh]">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Carregando...</CardTitle>
+              <CardDescription>Verificando suas permissões.</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </AppLayout>
+    );
+  }
+  
+  if (user.role !== 'master') {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[80vh]">
@@ -66,6 +80,10 @@ const UserManagement: React.FC = () => {
               <CardTitle>Acesso Negado</CardTitle>
               <CardDescription>Você não tem permissão para acessar esta página.</CardDescription>
             </CardHeader>
+            <CardContent>
+              <p>Seu perfil atual: {user.role || 'Não definido'}</p>
+              <p>Email: {user.email}</p>
+            </CardContent>
           </Card>
         </div>
       </AppLayout>
@@ -75,7 +93,7 @@ const UserManagement: React.FC = () => {
   // Filter users based on search query and active tab
   const filteredUsers = users.filter(user => {
     const matchesSearch = 
-      (user.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      ((user.name || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
       user.email.toLowerCase().includes(searchQuery.toLowerCase()));
     
     const matchesTab = activeTab === 'all' || user.role === activeTab;
@@ -131,7 +149,7 @@ const UserManagement: React.FC = () => {
       // Create new user - fixed to ensure email is required
       const newUser: User = {
         id: `new-${Date.now()}`,
-        email: data.email, // Make sure email is always provided
+        email: data.email, // Email is now required and properly assigned
         name: data.name,
         role: data.role,
         tenantId: data.tenantId,
@@ -208,7 +226,9 @@ const UserManagement: React.FC = () => {
                       </span>
                     </div>
                     <div className="col-span-2 text-sm">
-                      {user.tenantId ? mockTenants[user.tenantId]?.name || user.tenantId : 'Default'}
+                      {user.tenantId && mockTenants[user.tenantId] 
+                        ? mockTenants[user.tenantId].name 
+                        : user.tenantId || 'Default'}
                     </div>
                     <div className="col-span-2 flex justify-end gap-2">
                       <Button variant="ghost" size="icon" onClick={() => handleSelectUser(user)}>

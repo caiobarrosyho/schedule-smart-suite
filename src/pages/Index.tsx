@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,7 +8,10 @@ const Index: React.FC = () => {
   const { tenant } = useTenant();
   const { user } = useAuth();
   
-  console.log("Index page - Current user:", user); // Add debugging information
+  useEffect(() => {
+    console.log("Index page - Current user:", user); // Debug user information
+    console.log("User role:", user?.role); // Debug user role specifically
+  }, [user]);
 
   return (
     <div className="container mx-auto p-8">
@@ -23,6 +26,14 @@ const Index: React.FC = () => {
         <p>Nome: {tenant.name}</p>
         <p>Subdomínio: {tenant.subdomain}</p>
         <p>Tema: {tenant.theme}</p>
+      </div>
+
+      {/* Debug current user information */}
+      <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+        <h3 className="text-lg font-semibold">Debug - User Info</h3>
+        <p>User ID: {user?.id || 'Not logged in'}</p>
+        <p>User Email: {user?.email || 'N/A'}</p>
+        <p>User Role: {user?.role || 'N/A'}</p>
       </div>
 
       {/* Adicionar um link para a página de gerenciamento de tenants para usuários master */}
