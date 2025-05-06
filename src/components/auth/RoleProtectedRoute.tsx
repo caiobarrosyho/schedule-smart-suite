@@ -45,6 +45,12 @@ export const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({
     return <Navigate to="/login" replace />;
   }
 
+  // Check if user has master role which bypasses all role restrictions
+  if (user.role === 'master') {
+    console.log("RoleProtectedRoute - Master user detected, allowing access");
+    return <>{children}</>;
+  }
+
   if (!role || !allowedRoles.includes(role as UserRole)) {
     console.log("RoleProtectedRoute - User doesn't have required role:", { role, allowedRoles });
     return <Navigate to={fallbackPath} replace />;

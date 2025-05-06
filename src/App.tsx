@@ -7,6 +7,7 @@ import Unauthorized from './pages/Unauthorized';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { RoleProtectedRoute } from './components/auth/RoleProtectedRoute';
 import { useAuth } from './contexts/AuthContext';
 
 // Importar as novas páginas
@@ -14,6 +15,7 @@ import MyAppointments from './pages/MyAppointments';
 import Documents from './pages/Documents';
 import Payments from './pages/Payments';
 import Profile from './pages/Profile';
+import TenantManagement from './pages/TenantManagement';
 
 import './App.css';
 
@@ -73,6 +75,13 @@ function App() {
           <ProtectedRoute>
             <Profile />
           </ProtectedRoute>
+        } />
+
+        {/* Rota de gerenciamento de tenants - apenas para usuários master */}
+        <Route path="/tenant-management" element={
+          <RoleProtectedRoute allowedRoles={['master']}>
+            <TenantManagement />
+          </RoleProtectedRoute>
         } />
         
         {/* Fallback para rotas não encontradas */}
