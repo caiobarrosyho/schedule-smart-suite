@@ -8,25 +8,36 @@ import { Badge } from '@/components/ui/badge';
 import { AppointmentStatus } from '@/types';
 import { Appointment } from '@/types/appointment';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { useTenant } from '@/contexts/TenantContext';
 
 const MyAppointments: React.FC = () => {
   const { user } = useAuth();
+  const { tenant } = useTenant();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Função para mapear dados brutos para o formato Appointment
   const mapToAppointment = (raw: any): Appointment => ({
     id: raw.id,
+    tenantId: raw.tenantId,
     clientId: raw.clientId,
     professionalId: raw.professionalId,
+    serviceId: raw.serviceId,
     startTime: raw.startTime,
     endTime: raw.endTime,
     status: raw.status,
-    title: raw.title,
+    title: raw.title || '',
+    notes: raw.notes,
     createdAt: raw.createdAt,
-    tenantId: raw.tenantId,
     updatedAt: raw.updatedAt || raw.createdAt,
-    rescheduleCount: raw.rescheduleCount || 0
+    cancelledAt: raw.cancelledAt,
+    cancelledBy: raw.cancelledBy,
+    cancellationReason: raw.cancellationReason,
+    rescheduleCount: raw.rescheduleCount || 0,
+    previousAppointment: raw.previousAppointment,
+    payment: raw.payment,
+    recurrence: raw.recurrence
   });
 
   // Função para gerar dados de exemplo
@@ -49,12 +60,24 @@ const MyAppointments: React.FC = () => {
         id: `past-${i}`,
         clientId: user.id,
         professionalId: `prof-${i}`,
+        serviceId: `service-${i}`,
         startTime: pastDate.toISOString(),
         endTime: endDate.toISOString(),
         status: i === 0 ? 'completed' : i === 1 ? 'cancelled' : 'no_show',
         title: ['Corte de Cabelo', 'Manicure', 'Consulta Dentária'][i % 3],
+        notes: i === 1 ? 'Cliente solicitou cancelamento' : undefined,
         createdAt: new Date(pastDate.getTime() - 86400000).toISOString(),
-        tenantId: user.tenantId || 'default',
+        tenantId: tenant.id || user.tenantId || 'default',
+        cancelledAt: i === 1 ? new Date(pastDate.getTime() - 43200000).toISOString() : undefined,
+        cancelledBy: i === 1 ? user.id : undefined,
+        cancellationReason: i === 1 ? 'Compromisso de trabalho' : undefined,
+        rescheduleCount: i === 2 ? 1 : 0,
+        payment: i === 0 ? {
+          id: `payment-${i}`,
+          status: 'completed',
+          amount: 50 + (i * 10),
+          method: 'credit_card'
+        } : undefined
       });
     }
     
@@ -71,12 +94,14 @@ const MyAppointments: React.FC = () => {
         id: `future-${i}`,
         clientId: user.id,
         professionalId: `prof-${i + 3}`,
+        serviceId: `service-${i + 3}`,
         startTime: futureDate.toISOString(),
         endTime: endDate.toISOString(),
         status: i === 0 ? 'scheduled' : 'confirmed',
         title: ['Consulta Dentária', 'Corte de Cabelo', 'Manicure', 'Coloração'][i % 4],
         createdAt: new Date(futureDate.getTime() - 86400000).toISOString(),
-        tenantId: user.tenantId || 'default',
+        tenantId: tenant.id || user.tenantId || 'default',
+        rescheduleCount: 0
       });
     }
     
@@ -91,41 +116,7 @@ const MyAppointments: React.FC = () => {
       setAppointments(generateMockAppointments());
       setIsLoading(false);
     }, 1000);
-  }, [user]);
-
-  const getStatusBadge = (status: AppointmentStatus) => {
-    switch (status) {
-      case 'scheduled':
-        return <Badge className="bg-blue-500">Agendado</Badge>;
-      case 'confirmed':
-        return <Badge className="bg-green-500">Confirmado</Badge>;
-      case 'completed':
-        return <Badge className="bg-purple-500">Finalizado</Badge>;
-      case 'cancelled':
-        return <Badge className="bg-red-500">Cancelado</Badge>;
-      case 'no_show':
-        return <Badge className="bg-yellow-500">Não Compareceu</Badge>;
-      default:
-        return <Badge className="bg-gray-500">{status}</Badge>;
-    }
-  };
-
-  const formatDate = (isoString: string) => {
-    const date = new Date(isoString);
-    return date.toLocaleDateString('pt-BR', { 
-      day: '2-digit', 
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
-  
-  const formatTime = (isoString: string) => {
-    const date = new Date(isoString);
-    return date.toLocaleTimeString('pt-BR', { 
-      hour: '2-digit', 
-      minute: '2-digit'
-    });
-  };
+  }, [user, tenant]);
 
   if (isLoading) {
     return (
