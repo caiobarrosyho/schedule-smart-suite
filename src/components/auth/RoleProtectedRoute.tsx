@@ -19,7 +19,7 @@ export const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({
   tenantId,
   fallbackPath = '/unauthorized',
 }) => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const { role, isLoading: roleLoading } = useUserRole(tenantId);
   
   const isLoading = authLoading || roleLoading;

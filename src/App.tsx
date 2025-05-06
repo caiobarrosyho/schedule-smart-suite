@@ -19,13 +19,13 @@ const LoadingFallback = () => (
 );
 
 function App() {
-  const { loading, user } = useAuth();
+  const { isLoading, user } = useAuth();
   
   useEffect(() => {
-    console.log("App mounted, auth state:", { loading, user });
-  }, [loading, user]);
+    console.log("App mounted, auth state:", { isLoading, user });
+  }, [isLoading, user]);
 
-  if (loading) {
+  if (isLoading) {
     console.log("App - Auth is loading");
     return <LoadingFallback />;
   }
