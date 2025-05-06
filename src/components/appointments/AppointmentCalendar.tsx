@@ -129,7 +129,6 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
         eventPropGetter={eventStyleGetter}
         step={15}
         timeslots={4}
-        defaultTimeslot={4}
         min={moment().hour(tenant.settings.workingHours.start.split(':')[0] as unknown as number).minute(tenant.settings.workingHours.start.split(':')[1] as unknown as number).toDate()}
         max={moment().hour(tenant.settings.workingHours.end.split(':')[0] as unknown as number).minute(tenant.settings.workingHours.end.split(':')[1] as unknown as number).toDate()}
         formats={{
