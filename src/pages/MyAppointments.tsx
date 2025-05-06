@@ -5,7 +5,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Clock, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Appointment, AppointmentStatus } from '@/types';
+import { AppointmentStatus } from '@/types';
+import { Appointment } from '@/types/appointment';
 import { Button } from '@/components/ui/button';
 
 const MyAppointments: React.FC = () => {
@@ -13,12 +14,27 @@ const MyAppointments: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Função para mapear dados brutos para o formato Appointment
+  const mapToAppointment = (raw: any): Appointment => ({
+    id: raw.id,
+    clientId: raw.clientId,
+    professionalId: raw.professionalId,
+    startTime: raw.startTime,
+    endTime: raw.endTime,
+    status: raw.status,
+    title: raw.title,
+    createdAt: raw.createdAt,
+    tenantId: raw.tenantId,
+    updatedAt: raw.updatedAt || raw.createdAt,
+    rescheduleCount: raw.rescheduleCount || 0
+  });
+
   // Função para gerar dados de exemplo
-  const generateMockAppointments = (): Appointment[] => {
+  const generateMockAppointments = () => {
     if (!user) return [];
     
     const now = new Date();
-    const result: Appointment[] = [];
+    const rawAppointments: any[] = [];
     
     // Criar alguns agendamentos passados
     for (let i = 0; i < 3; i++) {
@@ -29,7 +45,7 @@ const MyAppointments: React.FC = () => {
       const endDate = new Date(pastDate);
       endDate.setMinutes(pastDate.getMinutes() + 60);
       
-      result.push({
+      rawAppointments.push({
         id: `past-${i}`,
         clientId: user.id,
         professionalId: `prof-${i}`,
@@ -51,7 +67,7 @@ const MyAppointments: React.FC = () => {
       const endDate = new Date(futureDate);
       endDate.setMinutes(futureDate.getMinutes() + 60);
       
-      result.push({
+      rawAppointments.push({
         id: `future-${i}`,
         clientId: user.id,
         professionalId: `prof-${i + 3}`,
@@ -64,7 +80,7 @@ const MyAppointments: React.FC = () => {
       });
     }
     
-    return result;
+    return rawAppointments.map(mapToAppointment);
   };
 
   useEffect(() => {
@@ -233,6 +249,41 @@ const MyAppointments: React.FC = () => {
       </div>
     </AppLayout>
   );
+};
+
+// Funções auxiliares
+const getStatusBadge = (status: AppointmentStatus) => {
+  switch (status) {
+    case 'scheduled':
+      return <Badge className="bg-blue-500">Agendado</Badge>;
+    case 'confirmed':
+      return <Badge className="bg-green-500">Confirmado</Badge>;
+    case 'completed':
+      return <Badge className="bg-purple-500">Finalizado</Badge>;
+    case 'cancelled':
+      return <Badge className="bg-red-500">Cancelado</Badge>;
+    case 'no_show':
+      return <Badge className="bg-yellow-500">Não Compareceu</Badge>;
+    default:
+      return <Badge className="bg-gray-500">{status}</Badge>;
+  }
+};
+
+const formatDate = (isoString: string) => {
+  const date = new Date(isoString);
+  return date.toLocaleDateString('pt-BR', { 
+    day: '2-digit', 
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
+
+const formatTime = (isoString: string) => {
+  const date = new Date(isoString);
+  return date.toLocaleTimeString('pt-BR', { 
+    hour: '2-digit', 
+    minute: '2-digit'
+  });
 };
 
 export default MyAppointments;
