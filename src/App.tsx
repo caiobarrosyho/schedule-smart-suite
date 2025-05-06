@@ -7,31 +7,28 @@ import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
 import { AppLayout } from './components/layout/AppLayout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import { AuthProvider } from './contexts/AuthContext';
 
 import './App.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/unauthorized" element={<Unauthorized />} />
-        
-        {/* Rotas protegidas */}
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Dashboard />
-            </AppLayout>
-          </ProtectedRoute>
-        } />
-        
-        {/* Fallback para rotas não encontradas */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </AuthProvider>
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+      
+      {/* Rotas protegidas */}
+      <Route path="/dashboard" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <Dashboard />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      {/* Fallback para rotas não encontradas */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 

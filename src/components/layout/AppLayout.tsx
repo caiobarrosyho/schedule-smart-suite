@@ -1,6 +1,6 @@
 
 import React from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../auth/AuthProvider";
 import { useTenant } from "../../contexts/TenantContext";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
 import {
@@ -25,7 +25,7 @@ interface AppLayoutProps {
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
-  const { user, logout } = useAuth();
+  const { user, signOut: logout } = useAuth();
   const { tenant, isLoading } = useTenant();
   const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
