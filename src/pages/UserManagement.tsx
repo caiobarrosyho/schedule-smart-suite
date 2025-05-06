@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -106,10 +105,16 @@ const UserManagement: React.FC = () => {
       ));
       toast.success("Usuário atualizado com sucesso");
     } else {
-      // Create new user
+      // Create new user - fixed to ensure email is required
       const newUser: User = {
         id: `new-${Date.now()}`,
-        ...data,
+        email: data.email, // Make sure email is always provided
+        name: data.name,
+        role: data.role,
+        tenantId: data.tenantId,
+        specialty: data.specialty,
+        bio: data.bio,
+        phone: data.phone,
         createdAt: new Date().toISOString()
       };
       setUsers([...users, newUser]);
