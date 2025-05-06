@@ -39,13 +39,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (storedUser) {
             console.log("Found user in localStorage");
             const parsedUser = JSON.parse(storedUser);
-            setUser(parsedUser);
             
-            // Validate stored user data
-            if (!parsedUser.email || !parsedUser.role) {
-              console.warn("Stored user data is invalid, logging out");
-              localStorage.removeItem("user");
-              setUser(null);
+            // Special handling for master user
+            if (parsedUser.email === "master@system.com" && parsedUser.role === "master") {
+              console.log("Found master user in localStorage, validating...");
+              setUser(parsedUser);
+            } else {
+              // Validate stored user data
+              if (!parsedUser.email || !parsedUser.role) {
+                console.warn("Stored user data is invalid, logging out");
+                localStorage.removeItem("user");
+                setUser(null);
+              } else {
+                setUser(parsedUser);
+              }
             }
           } else {
             console.log("No user found in localStorage");

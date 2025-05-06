@@ -20,39 +20,33 @@ export const useAuthMethods = (
       console.log("Login attempt:", { email });
       
       // Special handling for master user - simplified for easy testing
-      if (email === "master@example.com" || email === "master") {
-        console.log("Master user login detected");
+      if (email === "master" || email === "admin") {
+        console.log("Master/Admin login detected");
         
         if (password !== "masterpassword") {
-          throw new Error("Invalid password for master user");
+          throw new Error("Invalid password for master/admin user");
         }
         
-        const masterUser = mockUsers.find(u => u.role === "master");
+        // Create a dedicated master user with clear role information
+        const masterUser: User = {
+          id: "master-" + new Date().getTime(),
+          email: "master@system.com",
+          role: "master",
+          name: "Master Administrator",
+          tenantId: "master",
+          createdAt: new Date().toISOString(),
+          user_metadata: {
+            full_name: "Master Administrator",
+            avatar_url: null
+          }
+        };
         
-        if (masterUser) {
-          console.log("Found master user in mock data:", masterUser);
-          
-          // Add required fields to ensure it matches User type
-          const enhancedUser: User = {
-            id: masterUser.id,
-            email: "master@example.com", // Ensure email is not undefined
-            role: "master",
-            name: "Master Admin",
-            tenantId: "master",
-            createdAt: new Date().toISOString(),
-            user_metadata: {
-              full_name: "Master Administrator",
-              avatar_url: null
-            }
-          };
-          
-          // Save user to state and localStorage
-          setUser(enhancedUser);
-          localStorage.setItem("user", JSON.stringify(enhancedUser));
-          console.log("Master user successfully logged in");
-          setIsLoading(false);
-          return;
-        }
+        // Save user to state and localStorage
+        setUser(masterUser);
+        localStorage.setItem("user", JSON.stringify(masterUser));
+        console.log("Master user successfully logged in:", masterUser);
+        setIsLoading(false);
+        return;
       }
       
       // Try Supabase login first
@@ -73,14 +67,14 @@ export const useAuthMethods = (
         }
         
         // In a real app, you'd verify the password here
-        if (password !== "password" && password !== "masterpassword") { // Using "password" for all mock users, "masterpassword" for master
+        if (password !== "password" && password !== "masterpassword") {
           throw new Error("Invalid email or password");
         }
         
         // Add user_metadata for compatibility
         const enhancedUser: User = {
           ...foundUser,
-          email: foundUser.email, // Ensure email is not undefined
+          email: foundUser.email,
           user_metadata: {
             full_name: foundUser.name || "User",
             avatar_url: foundUser.avatar || null

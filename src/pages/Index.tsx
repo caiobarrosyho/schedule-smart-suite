@@ -79,9 +79,11 @@ const Index: React.FC = () => {
           <Link to="/login" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
             Fazer Login
           </Link>
-          <p className="mt-4 text-sm text-gray-600">
-            Para testar como usuário master: use "master" como email e "masterpassword" como senha.
-          </p>
+          <div className="mt-4 p-4 border border-amber-300 bg-amber-50 rounded-md">
+            <p className="text-sm font-medium text-amber-800">
+              Para testar como usuário master: use "master" ou "admin" como email e "masterpassword" como senha.
+            </p>
+          </div>
         </div>
       )}
     </div>
