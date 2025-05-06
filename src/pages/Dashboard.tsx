@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from "react";
-import { AppLayout } from "../components/layout/AppLayout";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { useTenant } from "../contexts/TenantContext";
 import { AppointmentCalendar } from "../components/appointments/AppointmentCalendar";
+import { AppLayout } from "../components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { 
   Card, 

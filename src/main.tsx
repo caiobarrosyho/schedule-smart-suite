@@ -11,12 +11,12 @@ import { AuthProvider } from './components/auth/AuthProvider.tsx'
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <TenantProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <TenantProvider>
           <Toaster position="top-right" />
           <App />
-        </AuthProvider>
-      </TenantProvider>
+        </TenantProvider>
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>,
 )

@@ -5,7 +5,6 @@ import Login from './pages/Login';
 import Unauthorized from './pages/Unauthorized';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
-import { AppLayout } from './components/layout/AppLayout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 import './App.css';
@@ -20,9 +19,7 @@ function App() {
       {/* Rotas protegidas */}
       <Route path="/dashboard" element={
         <ProtectedRoute>
-          <AppLayout>
-            <Dashboard />
-          </AppLayout>
+          <Dashboard />
         </ProtectedRoute>
       } />
       
