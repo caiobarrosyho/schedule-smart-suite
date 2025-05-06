@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,20 +36,21 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Default tenant theme */
+    --tenant-primary: 222.2 47.4% 11.2%;
+    --tenant-primary-foreground: 210 40% 98%;
+    --tenant-secondary: 210 40% 96.1%;
+    --tenant-secondary-foreground: 222.2 47.4% 11.2%;
+    --tenant-accent: 210 40% 96.1%;
+    --tenant-accent-foreground: 222.2 47.4% 11.2%;
   }
 
   .dark {
@@ -79,6 +81,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+    
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -87,6 +90,42 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Default tenant theme - dark mode */
+    --tenant-primary: 224.3 76.3% 48%;
+    --tenant-primary-foreground: 0 0% 100%;
+    --tenant-secondary: 217.2 32.6% 17.5%;
+    --tenant-secondary-foreground: 210 40% 98%;
+    --tenant-accent: 217.2 32.6% 17.5%;
+    --tenant-accent-foreground: 210 40% 98%;
+  }
+
+  /* Theme presets for tenants */
+  .theme-dental {
+    --tenant-primary: 199 89% 48%;
+    --tenant-primary-foreground: 0 0% 100%;
+    --tenant-secondary: 199 69% 90%;
+    --tenant-secondary-foreground: 199 89% 20%;
+    --tenant-accent: 199 69% 80%;
+    --tenant-accent-foreground: 199 89% 20%;
+  }
+
+  .theme-barber {
+    --tenant-primary: 15 73% 41%;
+    --tenant-primary-foreground: 0 0% 100%;
+    --tenant-secondary: 30 60% 90%;
+    --tenant-secondary-foreground: 15 73% 20%;
+    --tenant-accent: 30 60% 80%;
+    --tenant-accent-foreground: 15 73% 20%;
+  }
+  
+  .theme-salon {
+    --tenant-primary: 328 73% 41%;
+    --tenant-primary-foreground: 0 0% 100%;
+    --tenant-secondary: 328 60% 90%;
+    --tenant-secondary-foreground: 328 73% 20%;
+    --tenant-accent: 328 60% 80%;
+    --tenant-accent-foreground: 328 73% 20%;
   }
 }
 
@@ -98,4 +137,74 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom calendar styles */
+.rbc-calendar {
+  @apply font-sans w-full h-full;
+}
+
+.rbc-toolbar {
+  @apply flex flex-wrap mb-4 justify-between items-center;
+}
+
+.rbc-toolbar button {
+  @apply bg-white border border-gray-300 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-tenant;
+}
+
+.rbc-toolbar button.rbc-active {
+  @apply bg-tenant text-tenant-foreground;
+}
+
+.rbc-event {
+  @apply bg-tenant border-transparent rounded-md shadow-sm overflow-hidden text-tenant-foreground;
+}
+
+.rbc-event-label {
+  @apply font-medium;
+}
+
+.rbc-day-bg.rbc-today {
+  @apply bg-tenant-secondary bg-opacity-20;
+}
+
+.rbc-header {
+  @apply py-2 font-medium border-b;
+}
+
+.rbc-off-range-bg {
+  @apply bg-gray-50;
+}
+
+/* Custom form styles */
+.form-input-floating {
+  @apply relative;
+}
+
+.form-input-floating input:focus-within ~ label,
+.form-input-floating input:not(:placeholder-shown) ~ label {
+  @apply transform -translate-y-5 scale-75 text-tenant;
+}
+
+.form-input-floating label {
+  @apply absolute left-3 top-3 transition-all duration-200 ease-in-out origin-left text-gray-500;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-in-out;
 }
