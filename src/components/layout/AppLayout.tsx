@@ -1,6 +1,6 @@
 
 import React from "react";
-import { useAuth } from "@/components/auth/AuthProvider";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTenant } from "../../contexts/TenantContext";
 import { 
   Sidebar, 
@@ -156,13 +156,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   {!sidebarCollapsed && (
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.user_metadata?.avatar_url || undefined} />
+                        <AvatarImage src={user.avatar || user.user_metadata?.avatar_url} />
                         <AvatarFallback className="bg-tenant text-tenant-foreground">
                           {user.email?.charAt(0).toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-sm font-medium">{user.user_metadata?.full_name || user.email}</p>
+                        <p className="text-sm font-medium">{user.name || user.user_metadata?.full_name || user.email}</p>
                         <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
                     </div>

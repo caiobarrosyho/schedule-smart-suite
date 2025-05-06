@@ -5,7 +5,7 @@ export type UserRole = "super_admin" | "admin" | "professional" | "client";
 
 export interface User {
   id: string;
-  name: string;  // Adicionado name explicitamente
+  name: string;
   email: string;
   role: UserRole;
   tenantId: string;
@@ -18,6 +18,12 @@ export interface User {
   phone?: string;
   birthDate?: string;
   medicalNotes?: string;
+  // Add user_metadata field for compatibility with Supabase Auth
+  user_metadata?: {
+    avatar_url?: string;
+    full_name?: string;
+    [key: string]: any;
+  };
 }
 
 interface AuthContextType {
@@ -121,9 +127,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error("Invalid email or password");
       }
       
+      // Add user_metadata for compatibility
+      const enhancedUser: User = {
+        ...foundUser,
+        user_metadata: {
+          full_name: foundUser.name,
+          avatar_url: foundUser.avatar || null
+        }
+      };
+      
       // Save user to state and localStorage
-      setUser(foundUser);
-      localStorage.setItem("user", JSON.stringify(foundUser));
+      setUser(enhancedUser);
+      localStorage.setItem("user", JSON.stringify(enhancedUser));
     } catch (err) {
       console.error("Login failed:", err);
       setError(err instanceof Error ? err.message : "Login failed");
