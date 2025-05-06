@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +16,7 @@ import { mockUsers } from '@/types/auth';
 import { mockTenants } from '@/contexts/TenantContext';
 import { toast } from "sonner";
 import { Search, UserPlus, Edit, Trash } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Form schema for user management
 const userFormSchema = z.object({
@@ -30,6 +32,7 @@ const userFormSchema = z.object({
 type UserFormValues = z.infer<typeof userFormSchema>;
 
 const UserManagement: React.FC = () => {
+  const { user } = useAuth();
   const [users, setUsers] = useState<User[]>(mockUsers);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -48,6 +51,26 @@ const UserManagement: React.FC = () => {
       phone: ""
     }
   });
+  
+  useEffect(() => {
+    console.log("UserManagement - Current user:", user); // Add debugging information
+  }, [user]);
+
+  // Check if user is master, if not, return early with unauthorized message
+  if (!user || user.role !== 'master') {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[80vh]">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Acesso Negado</CardTitle>
+              <CardDescription>Você não tem permissão para acessar esta página.</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </AppLayout>
+    );
+  }
   
   // Filter users based on search query and active tab
   const filteredUsers = users.filter(user => {

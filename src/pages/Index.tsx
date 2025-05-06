@@ -7,6 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 const Index: React.FC = () => {
   const { tenant } = useTenant();
   const { user } = useAuth();
+  
+  console.log("Index page - Current user:", user); // Add debugging information
 
   return (
     <div className="container mx-auto p-8">
@@ -24,7 +26,7 @@ const Index: React.FC = () => {
       </div>
 
       {/* Adicionar um link para a página de gerenciamento de tenants para usuários master */}
-      {user?.role === 'master' && (
+      {user && user.role === 'master' && (
         <div className="mt-6 p-6 border rounded-lg bg-gray-50">
           <h2 className="text-2xl font-bold mb-4">Administração Master</h2>
           <p className="mb-4">Como usuário master, você tem acesso ao gerenciamento de tenants (lojas/clínicas) e usuários.</p>
