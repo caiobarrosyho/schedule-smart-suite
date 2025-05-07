@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { AppLayout } from "../components/layout/AppLayout";
+import { useAuth } from "../contexts/AuthContext";
 import { useTenant } from "../contexts/TenantContext";
 import { AppointmentCalendar } from "../components/appointments/AppointmentCalendar";
-import { AppLayout } from "../components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { 
   Card, 
@@ -90,10 +91,10 @@ const generateMockAppointments = (userId: string, tenantId: string, userRole: st
 };
 
 const Dashboard: React.FC = () => {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const { tenant } = useTenant();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [calendarView, setCalendarView] = useState<"day" | "week" | "month" | "agenda">("week");
 
@@ -102,7 +103,7 @@ const Dashboard: React.FC = () => {
     if (user) {
       const mockAppointments = generateMockAppointments(user.id, tenant.id, user.role);
       setAppointments(mockAppointments);
-      setIsLoading(false);
+      setLoading(false);
     }
   }, [user, tenant.id]);
 
@@ -142,25 +143,13 @@ const Dashboard: React.FC = () => {
     console.log("Selected appointment:", appointment);
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-tenant"></div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;  // This should not happen because of ProtectedRoute, but just in case
-  }
-
   return (
     <AppLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Dashboard</h1>
-            <p className="text-gray-500">Bem-vindo, {user?.name || 'Usuário'}!</p>
+            <p className="text-gray-500">Bem-vindo, {user?.name}!</p>
           </div>
           <Button className="bg-tenant text-tenant-foreground hover:bg-tenant/90">
             Novo Agendamento
@@ -258,7 +247,7 @@ const Dashboard: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent className="pt-4 pb-0">
-                {isLoading ? (
+                {loading ? (
                   <div className="h-[500px] flex items-center justify-center">
                     <div className="flex flex-col items-center space-y-4">
                       <div className="h-8 w-8 animate-spin rounded-full border-4 border-tenant border-t-transparent"></div>

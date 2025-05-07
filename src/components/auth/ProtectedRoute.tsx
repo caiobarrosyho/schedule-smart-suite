@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -12,10 +12,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children, 
   requiredRole 
 }) => {
-  const { user, isLoading } = useAuth();
-
-  // Adicionamos logs para depuração
-  console.log("ProtectedRoute - Auth state:", { user, isLoading, requiredRole });
+  const { user, loading: isLoading } = useAuth();
 
   if (isLoading) {
     // Show loading state while checking authentication
@@ -25,19 +22,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!user) {
-    console.log("ProtectedRoute - User not authenticated, redirecting to login");
     // Redirect to login if not authenticated
     return <Navigate to="/login" replace />;
   }
 
   if (requiredRole && user.role !== requiredRole) {
-    console.log("ProtectedRoute - User doesn't have required role:", requiredRole);
     // Redirect to unauthorized if user doesn't have required role
     return <Navigate to="/unauthorized" replace />;
   }
 
   // Render children if authenticated and authorized
-  console.log("ProtectedRoute - Auth passed, rendering children");
   return <>{children}</>;
 };
 

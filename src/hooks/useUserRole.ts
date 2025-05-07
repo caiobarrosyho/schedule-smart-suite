@@ -1,11 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
-import { UserRole } from '@/types/user';
+
+type UserRole = 'super_admin' | 'admin' | 'professional' | 'client' | null;
 
 interface UseUserRoleResult {
-  role: UserRole | null;
+  role: UserRole;
   isLoading: boolean;
   error: string | null;
   tenantId: string | null;
@@ -13,7 +14,7 @@ interface UseUserRoleResult {
 
 export const useUserRole = (tenantId?: string): UseUserRoleResult => {
   const { user } = useAuth();
-  const [role, setRole] = useState<UserRole | null>(null);
+  const [role, setRole] = useState<UserRole>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [userTenantId, setUserTenantId] = useState<string | null>(null);
@@ -26,17 +27,7 @@ export const useUserRole = (tenantId?: string): UseUserRoleResult => {
       }
 
       try {
-        console.log("useUserRole - Starting to fetch role for user:", user.id);
         setIsLoading(true);
-        
-        // Se o usuário já tem uma role definida no objeto user, use-a
-        if (user.role) {
-          console.log("useUserRole - User already has role defined:", user.role);
-          setRole(user.role as UserRole);
-          setUserTenantId(user.tenantId || null);
-          setIsLoading(false);
-          return;
-        }
         
         // Query para encontrar o papel do usuário no tenant específico ou em qualquer tenant
         let query = supabase
@@ -55,18 +46,15 @@ export const useUserRole = (tenantId?: string): UseUserRoleResult => {
         
         if (data && data.length > 0) {
           // Se o tenantId não foi especificado, pegamos o primeiro papel encontrado
-          console.log("useUserRole - Found role from database:", data[0].role);
           setRole(data[0].role as UserRole);
           setUserTenantId(data[0].tenant_id);
         } else {
-          // Se não encontramos papel para este usuário, usamos o que está no objeto user
-          console.log("useUserRole - Using default role from user object:", user.role || 'client');
-          setRole((user.role as UserRole) || 'client');
-          setUserTenantId(user.tenantId || null);
+          // Se não encontramos papel para este usuário, vamos assumir 'client' por padrão
+          setRole('client');
         }
         
       } catch (err: any) {
-        console.error('useUserRole - Erro ao buscar papel do usuário:', err);
+        console.error('Erro ao buscar papel do usuário:', err);
         setError(err.message || 'Falha ao carregar informações do usuário');
       } finally {
         setIsLoading(false);

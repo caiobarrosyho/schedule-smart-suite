@@ -1,5 +1,5 @@
 
-import { User, UserRole } from "./user";
+import { User, UserRole } from "../contexts/AuthContext";
 import { Tenant } from "../contexts/TenantContext";
 
 // Appointment status type
