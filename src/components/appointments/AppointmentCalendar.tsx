@@ -9,7 +9,7 @@ import { useTenant } from "../../contexts/TenantContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { toast } from "sonner";
 
 // Set up the localizer

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useTenant } from "../contexts/TenantContext";
@@ -146,7 +147,7 @@ const Dashboard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-gray-500">Bem-vindo, {user?.name || user?.email || "Usuário"}!</p>
+          <p className="text-gray-500">Bem-vindo, {user?.user_metadata?.full_name || user?.email || "Usuário"}!</p>
         </div>
         <Button className="bg-tenant text-tenant-foreground hover:bg-tenant/90">
           Novo Agendamento
