@@ -1,7 +1,5 @@
-
 import React, { useState, useEffect } from "react";
-import { AppLayout } from "../components/layout/AppLayout";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { useTenant } from "../contexts/TenantContext";
 import { AppointmentCalendar } from "../components/appointments/AppointmentCalendar";
 import { Button } from "@/components/ui/button";
@@ -144,256 +142,254 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <AppLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Dashboard</h1>
-            <p className="text-gray-500">Bem-vindo, {user?.name}!</p>
-          </div>
-          <Button className="bg-tenant text-tenant-foreground hover:bg-tenant/90">
-            Novo Agendamento
-          </Button>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="text-gray-500">Bem-vindo, {user?.name || user?.email || "Usuário"}!</p>
         </div>
+        <Button className="bg-tenant text-tenant-foreground hover:bg-tenant/90">
+          Novo Agendamento
+        </Button>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Agendamentos Hoje</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <Calendar className="h-6 w-6 text-tenant mr-2" />
-                <div className="text-2xl font-bold">{todayAppointments.length}</div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Próximos Agendamentos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <Clock className="h-6 w-6 text-tenant mr-2" />
-                <div className="text-2xl font-bold">{upcomingAppointments.length}</div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Consultas Realizadas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <CheckCircle className="h-6 w-6 text-tenant mr-2" />
-                <div className="text-2xl font-bold">{completedAppointments.length}</div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Taxa de Cancelamento</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <XCircle className="h-6 w-6 text-tenant mr-2" />
-                <div className="text-2xl font-bold">{cancellationRate}%</div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Agendamentos Hoje</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center">
+              <Calendar className="h-6 w-6 text-tenant mr-2" />
+              <div className="text-2xl font-bold">{todayAppointments.length}</div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Próximos Agendamentos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center">
+              <Clock className="h-6 w-6 text-tenant mr-2" />
+              <div className="text-2xl font-bold">{upcomingAppointments.length}</div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Consultas Realizadas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center">
+              <CheckCircle className="h-6 w-6 text-tenant mr-2" />
+              <div className="text-2xl font-bold">{completedAppointments.length}</div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Taxa de Cancelamento</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center">
+              <XCircle className="h-6 w-6 text-tenant mr-2" />
+              <div className="text-2xl font-bold">{cancellationRate}%</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        <Tabs defaultValue="calendar" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="calendar">Calendário</TabsTrigger>
-            <TabsTrigger value="today">Hoje</TabsTrigger>
-            <TabsTrigger value="upcoming">Próximos</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="calendar" className="mt-4">
-            <Card className="border-0 shadow-sm">
-              <CardHeader className="pb-0">
-                <div className="flex items-center justify-between">
-                  <CardTitle>Calendário de Agendamentos</CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setCalendarView('day')}
-                      className={calendarView === 'day' ? 'bg-tenant text-tenant-foreground' : ''}
-                    >
-                      Dia
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setCalendarView('week')}
-                      className={calendarView === 'week' ? 'bg-tenant text-tenant-foreground' : ''}
-                    >
-                      Semana
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setCalendarView('month')}
-                      className={calendarView === 'month' ? 'bg-tenant text-tenant-foreground' : ''}
-                    >
-                      Mês
-                    </Button>
+      <Tabs defaultValue="calendar" className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsTrigger value="calendar">Calendário</TabsTrigger>
+          <TabsTrigger value="today">Hoje</TabsTrigger>
+          <TabsTrigger value="upcoming">Próximos</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="calendar" className="mt-4">
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-0">
+              <div className="flex items-center justify-between">
+                <CardTitle>Calendário de Agendamentos</CardTitle>
+                <div className="flex items-center space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setCalendarView('day')}
+                    className={calendarView === 'day' ? 'bg-tenant text-tenant-foreground' : ''}
+                  >
+                    Dia
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setCalendarView('week')}
+                    className={calendarView === 'week' ? 'bg-tenant text-tenant-foreground' : ''}
+                  >
+                    Semana
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setCalendarView('month')}
+                    className={calendarView === 'month' ? 'bg-tenant text-tenant-foreground' : ''}
+                  >
+                    Mês
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-4 pb-0">
+              {loading ? (
+                <div className="h-[500px] flex items-center justify-center">
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-tenant border-t-transparent"></div>
+                    <p className="text-lg text-tenant">Carregando...</p>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent className="pt-4 pb-0">
-                {loading ? (
-                  <div className="h-[500px] flex items-center justify-center">
-                    <div className="flex flex-col items-center space-y-4">
-                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-tenant border-t-transparent"></div>
-                      <p className="text-lg text-tenant">Carregando...</p>
+              ) : (
+                <AppointmentCalendar 
+                  appointments={appointments}
+                  onAppointmentSelect={handleAppointmentSelect}
+                  onCreateAppointment={handleCreateAppointment}
+                  view={calendarView}
+                  defaultDate={selectedDate}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="today" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Agendamentos de Hoje</CardTitle>
+              <CardDescription>
+                {todayAppointments.length} agendamentos para {new Date().toLocaleDateString("pt-BR")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {todayAppointments.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  Não há agendamentos para hoje.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {todayAppointments.map(appointment => (
+                    <div 
+                      key={appointment.id} 
+                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handleAppointmentSelect(appointment)}
+                    >
+                      <div className="flex items-center">
+                        <div className="mr-4">
+                          <Clock className="h-6 w-6 text-tenant" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">{appointment.title || "Agendamento"}</h3>
+                          <p className="text-sm text-gray-500">
+                            {new Date(appointment.startTime).toLocaleTimeString("pt-BR", { 
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })} - {new Date(appointment.endTime).toLocaleTimeString("pt-BR", { 
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                      <div>
+                        {appointment.status === "scheduled" && (
+                          <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                            Agendado
+                          </span>
+                        )}
+                        {appointment.status === "confirmed" && (
+                          <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                            Confirmado
+                          </span>
+                        )}
+                        {appointment.status === "in_progress" && (
+                          <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                            Em Progresso
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <AppointmentCalendar 
-                    appointments={appointments}
-                    onAppointmentSelect={handleAppointmentSelect}
-                    onCreateAppointment={handleCreateAppointment}
-                    view={calendarView}
-                    defaultDate={selectedDate}
-                  />
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="today" className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Agendamentos de Hoje</CardTitle>
-                <CardDescription>
-                  {todayAppointments.length} agendamentos para {new Date().toLocaleDateString("pt-BR")}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {todayAppointments.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    Não há agendamentos para hoje.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {todayAppointments.map(appointment => (
-                      <div 
-                        key={appointment.id} 
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                        onClick={() => handleAppointmentSelect(appointment)}
-                      >
-                        <div className="flex items-center">
-                          <div className="mr-4">
-                            <Clock className="h-6 w-6 text-tenant" />
-                          </div>
-                          <div>
-                            <h3 className="font-medium">{appointment.title || "Agendamento"}</h3>
-                            <p className="text-sm text-gray-500">
-                              {new Date(appointment.startTime).toLocaleTimeString("pt-BR", { 
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })} - {new Date(appointment.endTime).toLocaleTimeString("pt-BR", { 
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </p>
-                          </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="upcoming" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Próximos Agendamentos</CardTitle>
+              <CardDescription>
+                {upcomingAppointments.length} agendamentos futuros
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {upcomingAppointments.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  Não há agendamentos futuros.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {upcomingAppointments.slice(0, 5).map(appointment => (
+                    <div 
+                      key={appointment.id} 
+                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handleAppointmentSelect(appointment)}
+                    >
+                      <div className="flex items-center">
+                        <div className="mr-4">
+                          <Calendar className="h-6 w-6 text-tenant" />
                         </div>
                         <div>
-                          {appointment.status === "scheduled" && (
-                            <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
-                              Agendado
-                            </span>
-                          )}
-                          {appointment.status === "confirmed" && (
-                            <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
-                              Confirmado
-                            </span>
-                          )}
-                          {appointment.status === "in_progress" && (
-                            <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
-                              Em Progresso
-                            </span>
-                          )}
+                          <h3 className="font-medium">{appointment.title || "Agendamento"}</h3>
+                          <p className="text-sm text-gray-500">
+                            {new Date(appointment.startTime).toLocaleDateString("pt-BR")} às {" "}
+                            {new Date(appointment.startTime).toLocaleTimeString("pt-BR", { 
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="upcoming" className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Próximos Agendamentos</CardTitle>
-                <CardDescription>
-                  {upcomingAppointments.length} agendamentos futuros
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {upcomingAppointments.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    Não há agendamentos futuros.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {upcomingAppointments.slice(0, 5).map(appointment => (
-                      <div 
-                        key={appointment.id} 
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                        onClick={() => handleAppointmentSelect(appointment)}
-                      >
-                        <div className="flex items-center">
-                          <div className="mr-4">
-                            <Calendar className="h-6 w-6 text-tenant" />
-                          </div>
-                          <div>
-                            <h3 className="font-medium">{appointment.title || "Agendamento"}</h3>
-                            <p className="text-sm text-gray-500">
-                              {new Date(appointment.startTime).toLocaleDateString("pt-BR")} às {" "}
-                              {new Date(appointment.startTime).toLocaleTimeString("pt-BR", { 
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </p>
-                          </div>
-                        </div>
-                        <div>
-                          {appointment.status === "scheduled" && (
-                            <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
-                              Agendado
-                            </span>
-                          )}
-                          {appointment.status === "confirmed" && (
-                            <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
-                              Confirmado
-                            </span>
-                          )}
-                        </div>
+                      <div>
+                        {appointment.status === "scheduled" && (
+                          <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                            Agendado
+                          </span>
+                        )}
+                        {appointment.status === "confirmed" && (
+                          <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                            Confirmado
+                          </span>
+                        )}
                       </div>
-                    ))}
-                    
-                    {upcomingAppointments.length > 5 && (
-                      <div className="text-center pt-4">
-                        <Button variant="ghost">Ver todos os {upcomingAppointments.length} agendamentos</Button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </AppLayout>
+                    </div>
+                  ))}
+                  
+                  {upcomingAppointments.length > 5 && (
+                    <div className="text-center pt-4">
+                      <Button variant="ghost">Ver todos os {upcomingAppointments.length} agendamentos</Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

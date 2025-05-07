@@ -2,7 +2,7 @@
 import React from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useTenant } from "../../contexts/TenantContext";
-import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter, useSidebar } from "@/components/ui/sidebar";
 import {
   Calendar,
   Users,
@@ -28,7 +28,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { user, signOut: logout } = useAuth();
   const { tenant, isLoading } = useTenant();
   const location = useLocation();
-  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+  const { state, toggleSidebar } = useSidebar();
+  const sidebarCollapsed = state === "collapsed";
 
   if (isLoading) {
     return (
@@ -119,7 +120,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              onClick={toggleSidebar}
               className="h-8 w-8"
             >
               {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
